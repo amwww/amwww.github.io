@@ -1,0 +1,19 @@
+body {
+    font-family:arial;
+    color: white;
+    background-color: black;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+.yeah {
+    background-color: rgb(20, 20, 20);
+    height: fit-content;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    aspect-ratio: 1/1;
+}
