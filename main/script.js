@@ -500,6 +500,7 @@ function changeDisplay() {
         g("wave-diagram").style.display = "block";
         g('answer-input').placeholder = "Hold the button...";
     } else {
+        g("answer-input").disabled = false;
         g("button").style.display = "none";
         g("text-output").style.height = "30vh"
         g("wave-diagram").style.display = "none";
