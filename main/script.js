@@ -509,11 +509,19 @@ function changeDisplay() {
 
 var t = 0;
 var passed = 0
-var tMult = 0.25;
+var tMult = .1;
 var parsed = "";
 var active = 0;
 var inactive = 0;
+var since = Date.now();
+var sinceUnit = 0;
+
+const letterSpacing = 5
+const enterSpacing = 20
 function drawWaveDiagram() {
+    var diff = Date.now() - since;
+    since = Date.now();
+    const timeUnits = diff;
     if (settings["answer-mode"] !== "button") return;
     const canvas = g("wave-diagram");
     const ctx = canvas.getContext("2d");
@@ -527,31 +535,34 @@ function drawWaveDiagram() {
     // Draw wave diagram based on current morse code playback
     // Placeholder implementation
     ctx.beginPath();
-    ctx.moveTo(t*tMult, height * (pressed ? 0.25 : 0.75));
+    ctx.moveTo(Math.round(t*tMult), height * (pressed ? 0.25 : 0.75));
     ctx.strokeStyle = "#00FF00";
     ctx.lineWidth = 2;
-    ctx.lineTo((t+1)*tMult, height * (pressed ? 0.25 : 0.75));
+    ctx.lineTo(Math.round(t*tMult+1), height * (pressed ? 0.25 : 0.75));
+    ctx.closePath();
     ctx.stroke();
-    const trueInactive = inactive/tMult;
+    const trueInactive = inactive;
     const unitsInactive = Math.round(trueInactive / unitLength);
-    const trueActive = active/tMult;
+    const trueActive = active;
     const unitsActive = trueActive / unitLength;
-    if ((passed/tMult) % unitLength === 0) {
+    if (((Date.now() - sinceUnit)) / unitLength >= 1) {
+        sinceUnit = Date.now();
         ctx.beginPath();
         ctx.moveTo((t+1)*tMult, 0);
         ctx.lineTo((t+1)*tMult, height);
         ctx.strokeStyle = "#555555";
-        if (unitsInactive == 4 && parsed) {
+        if (unitsInactive == letterSpacing && parsed) {
             ctx.strokeStyle = "#00FF00";
-        } else if (unitsInactive == 12 && parsed) {
+        } else if (unitsInactive == enterSpacing && parsed) {
             ctx.strokeStyle = "#FF0000";
         }
         ctx.lineWidth = 1;
+        ctx.closePath();
         ctx.stroke();
     }
     if (pressed) {
-        active++;
-        if (unitsInactive > 3 && parsed) {
+        active += timeUnits;
+        if (unitsInactive > letterSpacing && parsed) {
             parsed += " ";
         }
         inactive = 0;
@@ -567,17 +578,16 @@ function drawWaveDiagram() {
         parsed += symbol;
         g("answer-input").value = parsed;
         active = 0;
-        inactive++;
-        const trueInactive = inactive/tMult;
-        const unitsInactive = Math.round(trueInactive / unitLength);
-        if (unitsInactive > 12 && parsed) {
+        inactive += timeUnits;
+        if (unitsInactive > enterSpacing && parsed) {
             checkAnswer();
             parsed = "";
         }
         g("answer-input").value = parsed;
     }
-    t++;
-    passed++;
+    t += timeUnits;
+    passed += timeUnits;
+    //setTimeout(drawWaveDiagram, 0);
 }
 setInterval(drawWaveDiagram, 1);
 
