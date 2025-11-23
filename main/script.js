@@ -485,7 +485,94 @@ function changeDisplay() {
     } else {
         g('text-output-desc').innerText = "Read:";
     }
+    if (settings["answer-mode"] === "button") {
+        g("answer-input").disabled = true;
+        g("answer-input").value = "";
+        g("button").style.display = "block";
+        g("text-output").style.height = "15vh"
+        g("wave-diagram").style.display = "block";
+        g('answer-input').placeholder = "Hold the button...";
+    } else {
+        g("button").style.display = "none";
+        g("text-output").style.height = "30vh"
+        g("wave-diagram").style.display = "none";
+        g('answer-input').placeholder = "Type your answer here...";
+    }
 }
+
+var t = 0;
+var passed = 0
+var tMult = 0.25;
+var parsed = "";
+var active = 0;
+var inactive = 0;
+function drawWaveDiagram() {
+    if (settings["answer-mode"] !== "button") return;
+    const canvas = g("wave-diagram");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+    var pressed = g("button").matches(":active");
+    if (t*tMult > width) {
+        ctx.clearRect(0, 0, width, height);
+        t = 0;
+    }
+    // Draw wave diagram based on current morse code playback
+    // Placeholder implementation
+    ctx.beginPath();
+    ctx.moveTo(t*tMult, height * (pressed ? 0.25 : 0.75));
+    ctx.strokeStyle = "#00FF00";
+    ctx.lineWidth = 2;
+    ctx.lineTo((t+1)*tMult, height * (pressed ? 0.25 : 0.75));
+    ctx.stroke();
+    const trueInactive = inactive/tMult;
+    const unitsInactive = Math.round(trueInactive / unitLength);
+    const trueActive = active/tMult;
+    const unitsActive = trueActive / unitLength;
+    if ((passed/tMult) % unitLength === 0) {
+        ctx.beginPath();
+        ctx.moveTo((t+1)*tMult, 0);
+        ctx.lineTo((t+1)*tMult, height);
+        ctx.strokeStyle = "#555555";
+        if (unitsInactive == 4 && parsed) {
+            ctx.strokeStyle = "#00FF00";
+        } else if (unitsInactive == 12 && parsed) {
+            ctx.strokeStyle = "#FF0000";
+        }
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+    if (pressed) {
+        active++;
+        if (unitsInactive > 3 && parsed) {
+            parsed += " ";
+        }
+        inactive = 0;
+    } else {
+        let symbol = "";
+        if (unitsActive === 0) {
+
+        } else if (unitsActive <= 1.5) {
+            symbol = ".";
+        } else if (unitsActive > 1.5) {
+            symbol = "_";
+        }
+        parsed += symbol;
+        g("answer-input").value = parsed;
+        active = 0;
+        inactive++;
+        const trueInactive = inactive/tMult;
+        const unitsInactive = Math.round(trueInactive / unitLength);
+        if (unitsInactive > 12 && parsed) {
+            checkAnswer();
+            parsed = "";
+        }
+        g("answer-input").value = parsed;
+    }
+    t++;
+    passed++;
+}
+setInterval(drawWaveDiagram, 1);
 
 function writeSettingsToCheckboxes() {
     document.querySelectorAll(".mode-input").forEach(elem => {
