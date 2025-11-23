@@ -261,6 +261,10 @@ main {
     border-radius: 8px;
 }
 
+#unit-length {
+    width: 30vw;
+}
+
 /* The switch - the box around the slider */
 .switch {
   font-size: 17px;
@@ -415,7 +419,6 @@ nav {
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black;
   cursor: pointer;
 }
 
