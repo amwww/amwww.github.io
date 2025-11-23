@@ -120,7 +120,7 @@
                 </div>
             </div>
             <div id="controls-wrapper">
-                <i id="play-button" class='bx bx-play-circle control-button' onclick="playMorseCode(word, 'flashlight')"></i>
+                <i id="play-button" class='bx bx-play-circle control-button' onclick="playMorseCode(word, settings['practice-mode'] === 'read' ? settings['output-mode'] : 'audio')"></i>
                 <i id="pause-button" class='bx bx-pause-circle control-button' onclick="changeControlsState('pause')"></i>
                 <i id="reset-button" class='bx bx-reset control-button' onclick="changeControlsState('stop')"></i>
                 <i id="regenerate-button" class='bx bx-refresh control-button' onclick="refreshContent()"></i>

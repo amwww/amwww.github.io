@@ -90,7 +90,7 @@ function calculateLength(code) {
 }
 
 var currentCharacter = 0;
-function recursivePlay(word, remaining, mode, bounds, modeOverride=null) {
+function recursivePlay(word, remaining, mode, bounds) {
     var skip = bounds[0];
     var playfor = bounds[1];
     console.log(skip, playfor)
@@ -176,7 +176,7 @@ function recursivePlay(word, remaining, mode, bounds, modeOverride=null) {
         recursivePlay(word, remaining.slice(1), mode, [skip, playfor]);
     }, time);
 }
-
+var regenerateRotations = 1;
 function changeControlsState(newState) {
     if (newState === "idle") {
         g("flashlight").classList.remove("active");
@@ -211,6 +211,8 @@ function changeControlsState(newState) {
         g("pause-button").classList.add("disabled");
         g("reset-button").classList.add("disabled");
         g("regenerate-button").classList.add("disabled");
+        g("regenerate-button").style.transform = `rotate(${regenerateRotations * -360}deg)`;
+        regenerateRotations++
     }
     state = newState;
 }
@@ -346,7 +348,7 @@ function feedback(input, word) {
         const createdSpan = document.createElement("span");
         createdSpan.classList.add("feedback-letter");
         createdSpan.id = "feedback-letter-" + i;
-        createdSpan.setAttribute("onclick", `console.log("${word[i]}"); playMorseCode("${word}", settings["output-mode"], [${i}, 1]); `);
+        createdSpan.setAttribute("onclick", `console.log("${word[i]}"); playMorseCode("${word}", settings["practice-mode"] === "write" ? "audio" : settings["output-mode"], [${i}, 1]); `);
         if (!input[i]) {
             createdSpan.innerText = "_";
             createdSpan.classList.add("missing-letter");
@@ -465,7 +467,7 @@ function changeDisplay() {
     var mode = settings["practice-mode"];
     document.querySelectorAll(".mode-input").forEach(elem => {
         if (elem.classList.contains(mode) || (!elem.classList.contains("read") && !elem.classList.contains("write"))) {
-            elem.parentElement.style.display = "block";
+            elem.parentElement.style.display = "flex";
         } else {
             elem.parentElement.style.display = "none";
         }
