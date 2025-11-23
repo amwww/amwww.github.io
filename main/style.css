@@ -362,4 +362,5 @@ nav {
     height: 80px;
     width: 100vw;
     padding-left: 15px;
+    pointer-events: none;
 }
