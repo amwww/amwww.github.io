@@ -44,7 +44,12 @@ function g(id) {
 }
 
 function playMorseCode(word, mode, bounds=[0, word.length]) {
+    if (settings["practice-mode"] === "write") {
+        changeControlsState("playing");
+        recursivePlay(word, word, 'audio', bounds);
+    }
     if (state === "idle" || state === "refreshing") {
+        g("text-output").innerText = "";
         changeControlsState("playing");
         g("info-character").innerText = "0/" + word.length;
         recursivePlay(word, word, mode, bounds);
@@ -85,7 +90,7 @@ function calculateLength(code) {
 }
 
 var currentCharacter = 0;
-function recursivePlay(word, remaining, mode, bounds) {
+function recursivePlay(word, remaining, mode, bounds, modeOverride=null) {
     var skip = bounds[0];
     var playfor = bounds[1];
     console.log(skip, playfor)
@@ -146,7 +151,7 @@ function recursivePlay(word, remaining, mode, bounds) {
         console.log(symbol);
         playing = true;
         setTimeout(() => {
-            playMorseUnit(symbol);
+            playMorseUnit(symbol, mode);
         }, time);
         if (symbol === ".") {
             time += unitLength;
@@ -165,6 +170,9 @@ function recursivePlay(word, remaining, mode, bounds) {
         return;
     }
     setTimeout(() => {
+        if (settings["output-mode"] === "text" && settings["practice-mode"] === "read") {
+            g("text-output").innerHTML += "&nbsp;";
+        }
         recursivePlay(word, remaining.slice(1), mode, [skip, playfor]);
     }, time);
 }
@@ -209,8 +217,14 @@ function changeControlsState(newState) {
 
 g("answer-submit").onclick = checkAnswer;
 g("answer-input").onkeypress = function(e) {
+    console.log(e.key);
     if (e.key === 'Enter') {
         checkAnswer();
+    }
+    if (e.key === '`') {
+        console.log("Command pressed");
+        settings['practice-mode'] == 'read' ? playMorseCode(word, settings["practice-mode"] === "read" ? settings["output-mode"] : "audio") : 0;
+        e.preventDefault();
     }
     if (settings["answer-mode"] !== "letter") return;
     setTimeout(checkAnswer, 0);
@@ -266,24 +280,26 @@ function playTone(frequency, duration, volume = 0.5, type = 'sine') {
     oscillator.stop(audioCtx.currentTime + duration / 1000); // duration in ms, convert to seconds
 }
 
-function playMorseUnit(symbol) {
-    if (settings["output-mode"] === "audio") {
-        if (symbol === ".") {
-            playTone(600, unitLength);
-        } else if (symbol === "_") {
-            playTone(600, unitLength * 3);
-        }
+function playMorseUnit(symbol, mode) {
+    var duration;
+    if (symbol === ".") {
+        duration = unitLength;
+    } else if (symbol === "_") {
+        duration = unitLength * 3;
     }
-    if (settings["output-mode"] === "flashlight") {
+    if (mode === "audio") {
+        playTone(600, duration);
+    }
+    if (mode === "flashlight") {
         const flashlight = g("flashlight");
         flashlight.classList.add("active");
-        let duration = unitLength;
-        if (symbol === "_") {
-            duration = unitLength * 3;
-        }
         setTimeout(() => {
             flashlight.classList.remove("active");
         }, duration);
+    }
+    if (mode === "text") {
+        const flashlight = g("text-output");
+        flashlight.innerText += symbol;
     }
 }
 
@@ -292,7 +308,7 @@ function playMorseUnit(symbol) {
 const feedbackDuration = 1000; // milliseconds
 function checkAnswer() {
     var input = g("answer-input").value.toUpperCase();
-    if (settings["answer-mode"] === "interpret") {
+    if (settings["answer-mode"] === "interpret" || settings['practice-mode'] === 'write') {
         input = translateMorseToText(input);
     }
     if (settings["answer-mode"] === "static") {
@@ -330,7 +346,7 @@ function feedback(input, word) {
         const createdSpan = document.createElement("span");
         createdSpan.classList.add("feedback-letter");
         createdSpan.id = "feedback-letter-" + i;
-        createdSpan.setAttribute("onclick", `console.log("${word[i]}"); playMorseCode("${word}", 'flashlight', [${i}, 1]); `);
+        createdSpan.setAttribute("onclick", `console.log("${word[i]}"); playMorseCode("${word}", settings["output-mode"], [${i}, 1]); `);
         if (!input[i]) {
             createdSpan.innerText = "_";
             createdSpan.classList.add("missing-letter");
@@ -368,14 +384,34 @@ async function refreshContent() {
         const randomIndex = Math.floor(Math.random() * letters.length);
         content = letters[randomIndex];
     }
-    feedbackResult = feedback("", content);
-    g("answer-feedback").innerHTML = feedbackResult[1];
+    if (mode === "jumble") {
+        const letters = Object.keys(morseCode);
+        content = "";
+        for (let i = 0; i < 5; i++) {
+            const randomIndex = Math.floor(Math.random() * letters.length);
+            content += letters[randomIndex];
+        }
+    }
+    /*if (settings["answer-mode"] === "static") {
+        //g("answer-input").value = content;
+    } else {
+              
+    }
+    setTimeout(() => {
+        g("answer-input").value = "";
+    }, feedbackDuration); */
+
+    //feedbackResult = feedback("", content);
+    //g("answer-feedback").innerHTML = feedbackResult[1];
     word = content;
     changeControlsState("idle");
-    if (g("autoplay").checked) {
+    if (g("autoplay").checked && settings["practice-mode"] === "read") {
         setTimeout(() => {
             playMorseCode(word, settings["output-mode"]);
         }, feedbackDuration + 200);
+    }
+    if (settings["practice-mode"] === "write") {
+        g("text-output").innerText = word;
     }
 }
 
@@ -383,13 +419,83 @@ var settings = {
     "practice-mode": "read",
     "content-mode": "word",
     "output-mode": "flashlight",
-    "answer-mode": "text"
+    "answer-mode": "word"
 }
-document.querySelectorAll(".mode-input").forEach(elem => {
-    elem.onchange = function() {
-        if (this.checked) {
-            settings[this.name] = this.value;
-            console.log("Settings updated:", settings);
+
+const defaultSettings = {
+    "read": {
+        'practice-mode': 'read',
+        'content-mode': 'word',
+        'output-mode': 'flashlight',
+        'answer-mode': 'word'
+    },
+    "write": {
+        'practice-mode': 'write',
+        'content-mode': 'word',
+        'output-mode': 'text',
+        'answer-mode': 'word'
+    }
+}
+
+function updateOptions(updateElems = false) {
+    document.querySelectorAll(".mode-input").forEach(elem => {
+        if (updateElems) {
+            elem.onchange = function() {
+                if (this.name === "practice-mode") { 
+                    settings["practice-mode"] = this.value; 
+                    settings = defaultSettings[settings["practice-mode"]];
+                }
+                var mode = settings["practice-mode"];
+                console.log(mode, this.checked, this.classList.contains(mode), this.classList, (!elem.classList.contains("read") && !elem.classList.contains("write")))
+                if (this.checked && (this.classList.contains(mode) || (!elem.classList.contains("read") && !elem.classList.contains("write")))) {
+                    settings[this.name] = this.value;
+                    writeSettingsToCheckboxes();
+                    console.log("Settings updated:", settings);
+                }
+                changeDisplay();
+            };
         }
-    };
-});
+    });
+    console.log(settings)
+    changeDisplay();
+}
+updateOptions(true);
+
+function changeDisplay() {
+    var mode = settings["practice-mode"];
+    document.querySelectorAll(".mode-input").forEach(elem => {
+        if (elem.classList.contains(mode) || (!elem.classList.contains("read") && !elem.classList.contains("write"))) {
+            elem.parentElement.style.display = "block";
+        } else {
+            elem.parentElement.style.display = "none";
+        }
+    });
+    if (settings["output-mode"] === "text") {
+        g("text-output").style.display = "block";
+        g("flashlight").style.display = "none";
+    } else {
+        g("text-output").style.display = "none";
+        g("flashlight").style.display = "block";
+    }
+    if (settings["practice-mode"] === "write") {
+        g("flashlight").style.display = "none";
+        g('text-output-desc').innerText = "Translate:";
+    } else {
+        g('text-output-desc').innerText = "Read:";
+    }
+}
+
+function writeSettingsToCheckboxes() {
+    document.querySelectorAll(".mode-input").forEach(elem => {
+        if (!elem.classList.contains(settings["practice-mode"])) {
+            if (!(!elem.classList.contains("read") && !elem.classList.contains("write"))) {
+                elem.checked = false;
+            }
+            return;
+        } 
+        if (settings[elem.name] === elem.value) {
+            elem.checked = true;
+        }
+    });
+}
+writeSettingsToCheckboxes();

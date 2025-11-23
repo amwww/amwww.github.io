@@ -34,41 +34,54 @@
                         <input type="radio" id="content-letter" name="content-mode" value="letter" class="mode-input">
                         <label for="content-letter" class="mode">Letter</label>
 
-                        <input type="radio" id="content-quote" name="content-mode" value="quote" class="mode-input">
-                        <label for="content-quote" class="mode">Quote</label>
-
-                        <input type="radio" id="content-callsign" name="content-mode" value="callsign" class="mode-input">
-                        <label for="content-callsign" class="mode">Callsign</label>
+                        <input type="radio" id="content-quote" name="content-mode" value="jumble" class="mode-input">
+                        <label for="content-quote" class="mode">Jumble</label>
                     </div>
                 </div>
                 <div class="mode-parent">
                     <div class="mode-wrapper-label">Output Mode</div>
                     <div id="output-mode-wrapper" class="mode-wrapper" role="radiogroup" aria-label="Output Mode">
-                        <input type="radio" id="output-flashlight" name="output-mode" value="flashlight" class="mode-input" checked>
+                        <input type="radio" id="output-flashlight" name="output-mode" value="flashlight" class="mode-input read" checked>
                         <label for="output-flashlight" class="mode">Flashlight</label>
 
-                        <input type="radio" id="output-audio" name="output-mode" value="audio" class="mode-input">
+                        <input type="radio" id="output-audio" name="output-mode" value="audio" class="mode-input read">
                         <label for="output-audio" class="mode">Audio</label>
 
-                        <input type="radio" id="output-text" name="output-mode" value="text" class="mode-input">
+                        <input type="radio" id="output-text" name="output-mode" value="text" class="mode-input read">
                         <label for="output-text" class="mode">Text</label>
+                    </div>
+                    <div id="output-mode-wrapper-write" class="mode-wrapper" role="radiogroup" aria-label="Output Mode">
+                        <input type="radio" id="output-text-write" name="output-mode" value="text" class="mode-input write" checked>
+                        <label for="output-text-write" class="mode">Text</label>
                     </div>
                 </div>
 
                 <div class="mode-parent">
                     <div class="mode-wrapper-label">Answer Mode</div>
                     <div id="answer-mode-wrapper" class="mode-wrapper" role="radiogroup" aria-label="Answer Mode">
-                        <input type="radio" id="answer-word" name="answer-mode" value="word" class="mode-input" checked>
+                        <input type="radio" id="answer-word" name="answer-mode" value="word" class="mode-input read" checked>
                         <label for="answer-word" class="mode">Word</label>
-
-                        <input type="radio" id="answer-letter" name="answer-mode" value="letter" class="mode-input">
+                        
+                        <input type="radio" id="answer-letter" name="answer-mode" value="letter" class="mode-input read">
                         <label for="answer-letter" class="mode">Letter</label>
 
-                        <input type="radio" id="answer-interpret" name="answer-mode" value="interpret" class="mode-input">
+                        <input type="radio" id="answer-interpret" name="answer-mode" value="interpret" class="mode-input read">
                         <label for="answer-interpret" class="mode">Interpret</label>
 
-                        <input type="radio" id="answer-static" name="answer-mode" value="static" class="mode-input">
+                        <input type="radio" id="answer-static" name="answer-mode" value="static" class="mode-input read">
                         <label for="answer-static" class="mode">Static</label>
+                    </div>
+                    <div id="answer-mode-wrapper-write" class="mode-wrapper" role="radiogroup" aria-label="Answer Mode">
+                        <input type="radio" id="answer-word-write" name="answer-mode" value="word" class="mode-input write" checked>
+                        <label for="answer-word-write" class="mode">Word</label>
+
+                        <input type="radio" id="answer-letter-write" name="answer-mode" value="letter" class="mode-input write">
+                        <label for="answer-letter-write" class="mode">Letter</label>
+
+                        <input type="radio" id="answer-interpret-write" name="answer-mode" value="button" class="mode-input write">
+                        <label for="answer-interpret-write" class="mode">Button</label>
+                        <input type="radio" id="answer-static-write" name="answer-mode" value="static" class="mode-input write">
+                        <label for="answer-static-write" class="mode">Static</label>
                     </div>
                 </div>
                 <label for="unit-length" id="unit-length-label">Unit Length (100ms, 24wpm): </label>
@@ -86,7 +99,9 @@
                     </label>
                 </div>
             </div>
+            <div id="text-output-desc">Translate:</div>
             <div id="flashlight" class=""></div>
+            <div id="text-output"></div>
             <div id="info-wrapper">
                 <div id="info-status">Idle</div>
                 <div id="info-character">-</div>
