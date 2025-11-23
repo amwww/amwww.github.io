@@ -345,3 +345,21 @@ input[type="checkbox"]:checked + .switch-slider:before {
 #regenerate-button {
     transition: transform .5s ease-in-out, color 0.2s ease-in-out;
 }
+
+#logo {
+    width: 50px;
+    aspect-ratio: 1;
+}
+
+nav {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+    height: 80px;
+    width: 100vw;
+    padding-left: 15px;
+}
