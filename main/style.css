@@ -254,9 +254,14 @@ main {
     justify-content: space-evenly;
     flex-wrap: wrap;
     gap: 10px;
-    max-width: 300px;
+    width: 320px;
     margin-left: 20px;
     height: 90vh;
+}
+
+.morse-letter {
+    position: absolute;
+    display: none;
 }
 
 .morse-letter-wrapper {
@@ -265,6 +270,7 @@ main {
     background-color: rgb(45, 46, 49);
     padding: 6px 10px;
     border-radius: 8px;
+    width: 50%;
 }
 
 #unit-length {
@@ -374,7 +380,7 @@ input[type="checkbox"]:checked + .switch-slider:before {
 }
 
 #regenerate-button {
-    transition: transform .5s ease-in-out, color 0.2s ease-in-out;
+    transition: transform .75s ease-in-out, color 0.2s ease-in-out !important;
 }
 
 #logo {

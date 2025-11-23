@@ -44,11 +44,12 @@ function g(id) {
 }
 
 function playMorseCode(word, mode, bounds=[0, word.length]) {
-    if (settings["practice-mode"] === "write") {
-        changeControlsState("playing");
-        recursivePlay(word, word, 'audio', bounds);
-    }
     if (state === "idle" || state === "refreshing") {
+        if (settings["practice-mode"] === "write") {
+            changeControlsState("playing");
+            recursivePlay(word, word, 'audio', bounds);
+            return;
+        }
         g("text-output").innerText = "";
         changeControlsState("playing");
         g("info-character").innerText = "0/" + word.length;
@@ -446,6 +447,12 @@ function updateOptions(updateElems = false) {
                 if (this.name === "practice-mode") { 
                     settings["practice-mode"] = this.value; 
                     settings = defaultSettings[settings["practice-mode"]];
+                    g("text-output").innerText = "";
+                    refreshContent();
+
+                }
+                if (this.name === "content-mode") {
+                    refreshContent();
                 }
                 var mode = settings["practice-mode"];
                 console.log(mode, this.checked, this.classList.contains(mode), this.classList, (!elem.classList.contains("read") && !elem.classList.contains("write")))
@@ -588,3 +595,4 @@ function writeSettingsToCheckboxes() {
     });
 }
 writeSettingsToCheckboxes();
+refreshContent();
