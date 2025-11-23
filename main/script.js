@@ -451,15 +451,15 @@ function updateOptions(updateElems = false) {
                     refreshContent();
 
                 }
-                if (this.name === "content-mode") {
-                    refreshContent();
-                }
                 var mode = settings["practice-mode"];
                 console.log(mode, this.checked, this.classList.contains(mode), this.classList, (!elem.classList.contains("read") && !elem.classList.contains("write")))
                 if (this.checked && (this.classList.contains(mode) || (!elem.classList.contains("read") && !elem.classList.contains("write")))) {
                     settings[this.name] = this.value;
                     writeSettingsToCheckboxes();
                     console.log("Settings updated:", settings);
+                }
+                if (this.name === "content-mode") {
+                    refreshContent();
                 }
                 changeDisplay();
             };
