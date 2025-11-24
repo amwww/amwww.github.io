@@ -7,6 +7,13 @@
     transition: all 0.2s ease-in-out;
 }
 
+body {
+    overflow: hidden;
+    background-color: rgb(51, 52, 55);
+    height: 100vh;
+    width: 100vw;
+}
+
 #main {
     display: flex;
     flex-direction: row;
@@ -19,7 +26,6 @@ main {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    flex-wrap: wrap;
     flex-direction: column;
     height: 100vh;
 }
@@ -248,9 +254,14 @@ main {
     justify-content: space-evenly;
     flex-wrap: wrap;
     gap: 10px;
-    max-width: 300px;
+    width: 320px;
     margin-left: 20px;
     height: 90vh;
+}
+
+.morse-letter {
+    position: absolute;
+    display: none;
 }
 
 .morse-letter-wrapper {
@@ -259,6 +270,32 @@ main {
     background-color: rgb(45, 46, 49);
     padding: 6px 10px;
     border-radius: 8px;
+    width: 50%;
+}
+
+#unit-length {
+    width: 30vw;
+}
+
+@media screen and (max-width: 450px) {
+    .mode-wrapper-label {
+        display: none;
+    }
+    #input-parent {
+        flex-direction: column;
+    }
+    #feedback-info {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    #morse-table {
+        display: none;
+    }
+    #statistics-wrapper {
+        display: none;
+    }
 }
 
 /* The switch - the box around the slider */
@@ -343,7 +380,7 @@ input[type="checkbox"]:checked + .switch-slider:before {
 }
 
 #regenerate-button {
-    transition: transform .5s ease-in-out, color 0.2s ease-in-out;
+    transition: transform .75s ease-in-out, color 0.2s ease-in-out !important;
 }
 
 #logo {
@@ -362,4 +399,93 @@ nav {
     height: 80px;
     width: 100vw;
     padding-left: 15px;
+    pointer-events: none;
+}
+
+#button {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    border: 3px solid rgb(101, 102, 105);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#button:hover {
+    border-color: white;
+    position: relative;
+    z-index: 0;
+}
+
+#button::after{
+    content: "";
+    width: 56px;
+    aspect-ratio: 1;
+    display: block;
+    position: relative;
+    left: -3px;
+    top: -3px;
+    z-index: -1;
+    background-color: #E2B715;
+    border-radius: 50%;
+    scale: 0;
+    transition: all .25s ease-in-out;
+}
+
+#button:active {
+    border-color: #E2B715;
+}
+
+#button:active::after {
+    scale: 2;
+}
+
+#wave-diagram {
+    width: 50vw;
+    height: 15vh;
+    background-color: rgb(45, 46, 49);
+    margin-top: 10px;
+    border-radius: 10px;
+    display: none;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltiptext {
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  left: 110%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(0%, -25%);
+}
+
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  opacity: 1;
+}
+
+#feedback-info {
+    font-size: 15px;
+    cursor: pointer;
 }
