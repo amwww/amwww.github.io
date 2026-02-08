@@ -10,7 +10,7 @@ document.getElementById('unit-length').onclick = updateUnitLength;
 document.getElementById('unit-length').ontouchmove = updateUnitLength;
 document.getElementById('unit-length').onchange = updateUnitLength;
 
-const morse = "A . _ B _ . . . C _ . _ . D _ . . E . F . . _ . G _ _ . H . . . . I . . J . _ _ _ K _ . _ L . _ . . M _ _ N _ . O _ _ _ P . _ _ . Q _ _ . _ R . _ . S . . . T _ U . . _ V . . . _ W . _ _ X _ . . _ Y _ . _ _ Z _ _ . . 1 . _ _ _ 2 . . _ _ _ 3 . . . _ _ 4 . . . . _ _"
+const morse = "A . _ B _ . . . C _ . _ . D _ . . E . F . . _ . G _ _ . H . . . . I . . J . _ _ _ K _ . _ L . _ . . M _ _ N _ . O _ _ _ P . _ _ . Q _ _ . _ R . _ . S . . . T _ U . . _ V . . . _ W . _ _ X _ . . _ Y _ . _ _ Z _ _ . . 1 . _ _ _ _ 2 . . _ _ _ 3 . . . _ _ 4 . . . . _ _"
 // loop over string
 var morseCode = {};
 var morseArray = morse.split(" ");
@@ -258,6 +258,105 @@ function translateMorseToText(morse) {
 }
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// Tooltip overlay manager: prevents clipping behind panels / scroll containers.
+(function initTooltipOverlay() {
+    const existing = document.getElementById('tooltip-overlay');
+    const overlay = existing || document.createElement('div');
+    overlay.id = 'tooltip-overlay';
+    overlay.setAttribute('role', 'tooltip');
+    overlay.dataset.open = 'false';
+    if (!existing) document.body.appendChild(overlay);
+
+    let activeAnchor = null;
+    let raf = 0;
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function readTooltipText(anchor) {
+        const textEl = anchor.querySelector('.tooltiptext');
+        const text = (textEl ? textEl.textContent : '').trim();
+        return text;
+    }
+
+    function positionOverlay(anchor) {
+        if (!anchor || overlay.dataset.open !== 'true') return;
+
+        const margin = 10;
+        const rect = anchor.getBoundingClientRect();
+
+        // Measure overlay after setting text.
+        overlay.style.left = '0px';
+        overlay.style.top = '0px';
+        const overlayRect = overlay.getBoundingClientRect();
+
+        const spaceAbove = rect.top;
+        const spaceBelow = window.innerHeight - rect.bottom;
+
+        const preferTop = spaceAbove > spaceBelow;
+        const canFitTop = spaceAbove >= overlayRect.height + 16;
+        const placeTop = preferTop && canFitTop;
+
+        const placement = placeTop ? 'top' : 'bottom';
+        overlay.dataset.placement = placement;
+
+        const centerX = rect.left + rect.width / 2;
+        const left = clamp(centerX - overlayRect.width / 2, margin, window.innerWidth - overlayRect.width - margin);
+
+        let top;
+        if (placement === 'top') {
+            top = rect.top - overlayRect.height - 10;
+            top = Math.max(margin, top);
+        } else {
+            top = rect.bottom + 10;
+            top = Math.min(window.innerHeight - overlayRect.height - margin, top);
+        }
+
+        overlay.style.left = `${Math.round(left)}px`;
+        overlay.style.top = `${Math.round(top)}px`;
+
+        const arrowX = clamp(centerX - left, 12, overlayRect.width - 12);
+        overlay.style.setProperty('--arrow-x', `${Math.round(arrowX)}px`);
+    }
+
+    function show(anchor) {
+        const text = readTooltipText(anchor);
+        if (!text) return;
+        activeAnchor = anchor;
+        overlay.textContent = text;
+        overlay.dataset.open = 'true';
+        positionOverlay(anchor);
+    }
+
+    function hide(anchor) {
+        if (anchor && activeAnchor !== anchor) return;
+        activeAnchor = null;
+        overlay.dataset.open = 'false';
+    }
+
+    function scheduleReposition() {
+        if (!activeAnchor) return;
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+            raf = 0;
+            positionOverlay(activeAnchor);
+        });
+    }
+
+    const anchors = document.querySelectorAll('.tooltip');
+    anchors.forEach(anchor => {
+        anchor.addEventListener('pointerenter', () => show(anchor));
+        anchor.addEventListener('pointerleave', () => hide(anchor));
+        anchor.addEventListener('focusin', () => show(anchor));
+        anchor.addEventListener('focusout', () => hide(anchor));
+        anchor.addEventListener('pointermove', scheduleReposition);
+    });
+
+    window.addEventListener('resize', scheduleReposition);
+    window.addEventListener('scroll', scheduleReposition, true);
+})();
 
 function playTone(frequency, duration, volume = 0.5, type = 'sine') {
     // Create an OscillatorNode
